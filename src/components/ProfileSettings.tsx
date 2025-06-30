@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
 
 const ProfileSettings = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
   const [profile, setProfile] = useState({
     name: 'John Doe',
     phone: '+91 98765 43210',
@@ -26,8 +28,43 @@ const ProfileSettings = () => {
 
   const handleSave = () => {
     setIsEditing(false);
-    // In a real app, this would save to backend
-    alert('Profile updated successfully!');
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been successfully updated.",
+      duration: 3000,
+    });
+  };
+
+  const handleNotificationChange = (type: keyof typeof profile.notifications, checked: boolean) => {
+    setProfile(prev => ({
+      ...prev,
+      notifications: {
+        ...prev.notifications,
+        [type]: checked
+      }
+    }));
+    
+    toast({
+      title: "Notification Settings Updated",
+      description: `${type.toUpperCase()} notifications ${checked ? 'enabled' : 'disabled'}.`,
+      duration: 2000,
+    });
+  };
+
+  const handleAddEmergencyContact = () => {
+    toast({
+      title: "Add Emergency Contact",
+      description: "This feature will be available soon.",
+      duration: 2000,
+    });
+  };
+
+  const handleSecurityAction = (action: string) => {
+    toast({
+      title: "Security Action",
+      description: `${action} feature will be available soon.`,
+      duration: 2000,
+    });
   };
 
   return (
@@ -119,7 +156,12 @@ const ProfileSettings = () => {
                     <p className="text-sm text-gray-600">{contact.relation}</p>
                     <p className="text-sm text-rapidaid-blue font-medium">{contact.phone}</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-rapidaid-blue">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-rapidaid-blue"
+                    onClick={() => window.open(`tel:${contact.phone}`)}
+                  >
                     <Phone className="h-4 w-4" />
                   </Button>
                 </div>
@@ -127,7 +169,11 @@ const ProfileSettings = () => {
             </Card>
           ))}
           
-          <Button variant="outline" className="w-full h-12 rounded-2xl border-dashed border-2 text-rapidaid-blue border-rapidaid-blue hover:bg-rapidaid-light">
+          <Button 
+            variant="outline" 
+            className="w-full h-12 rounded-2xl border-dashed border-2 text-rapidaid-blue border-rapidaid-blue hover:bg-rapidaid-light"
+            onClick={handleAddEmergencyContact}
+          >
             + Add Emergency Contact
           </Button>
         </CardContent>
@@ -150,12 +196,7 @@ const ProfileSettings = () => {
             </div>
             <Switch
               checked={profile.notifications.sms}
-              onCheckedChange={(checked) => 
-                setProfile({
-                  ...profile, 
-                  notifications: {...profile.notifications, sms: checked}
-                })
-              }
+              onCheckedChange={(checked) => handleNotificationChange('sms', checked)}
             />
           </div>
           
@@ -166,12 +207,7 @@ const ProfileSettings = () => {
             </div>
             <Switch
               checked={profile.notifications.email}
-              onCheckedChange={(checked) => 
-                setProfile({
-                  ...profile, 
-                  notifications: {...profile.notifications, email: checked}
-                })
-              }
+              onCheckedChange={(checked) => handleNotificationChange('email', checked)}
             />
           </div>
           
@@ -182,12 +218,7 @@ const ProfileSettings = () => {
             </div>
             <Switch
               checked={profile.notifications.push}
-              onCheckedChange={(checked) => 
-                setProfile({
-                  ...profile, 
-                  notifications: {...profile.notifications, push: checked}
-                })
-              }
+              onCheckedChange={(checked) => handleNotificationChange('push', checked)}
             />
           </div>
         </CardContent>
@@ -203,13 +234,25 @@ const ProfileSettings = () => {
         </CardHeader>
         
         <CardContent className="space-y-4">
-          <Button variant="outline" className="w-full h-12 rounded-2xl justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full h-12 rounded-2xl justify-start"
+            onClick={() => handleSecurityAction('Change Password')}
+          >
             Change Password
           </Button>
-          <Button variant="outline" className="w-full h-12 rounded-2xl justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full h-12 rounded-2xl justify-start"
+            onClick={() => handleSecurityAction('Two-Factor Authentication')}
+          >
             Two-Factor Authentication
           </Button>
-          <Button variant="outline" className="w-full h-12 rounded-2xl justify-start text-emergency border-emergency hover:bg-red-50">
+          <Button 
+            variant="outline" 
+            className="w-full h-12 rounded-2xl justify-start text-emergency border-emergency hover:bg-red-50"
+            onClick={() => handleSecurityAction('Delete Account')}
+          >
             Delete Account
           </Button>
         </CardContent>
